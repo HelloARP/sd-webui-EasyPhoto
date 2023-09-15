@@ -25,10 +25,23 @@ def check_id_valid(user_id, user_id_outpath_samples, models_path):
     return True
 
 def urldownload_progressbar(url, filepath):
-    for url in filepath:
-        command = f'aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --remote-time -d "{filepath}" "{url}" '
-    print(command)
-    subprocess.run(command, shell=True)
+    start = time.time() 
+    response = requests.get(url, stream=True)
+    size = 0 
+    chunk_size = 1024
+    content_size = int(response.headers['content-length']) 
+    try:
+        if response.status_code == 200: 
+            print('Start download,[File size]:{size:.2f} MB'.format(size = content_size / chunk_size /1024))  
+            with open(filepath,'wb') as file:  
+                for data in response.iter_content(chunk_size = chunk_size):
+                    file.write(data)
+                    size +=len(data)
+                    print('\r'+'[下载进度]:%s%.2f%%' % ('>'*int(size*50/ content_size), float(size / content_size * 100)) ,end=' ')
+        end = time.time()
+        print('Download completed!,times: %.2f秒' % (end - start))
+    except:
+        print('Error!')
 
 def check_files_exists_and_download():
     controlnet_extensions_path          = os.path.join(data_path, "extensions", "sd-webui-controlnet")
