@@ -28,7 +28,7 @@ def urldownload_progressbar(url, filepath):
     start = time.time() 
     response = requests.get(url, stream=True)
     size = 0 
-    chunk_size = 1024
+    chunk_size = 262144 # 原值：1024；1Gbps建议chunk_size设置为262144-524288,最大利用带宽；100Mbps网络,建议chunk_size设置为32768-65536,最大利用带宽；10Mbps网络,建议chunk_size设置为8192-16384,最大利用带宽
     content_size = int(response.headers['content-length']) 
     try:
         if response.status_code == 200: 
